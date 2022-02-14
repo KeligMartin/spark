@@ -66,3 +66,5 @@ file_df.withColumn('word', explode(split(col('message'), ' '))) \
     .sort('count', ascending=False) \
     .show(10, False)
 
+from time import sleep
+sleep(1000)
