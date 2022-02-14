@@ -34,6 +34,17 @@ file_df \
     .orderBy(desc("Commits")) \
     .show(1, False)
 
+print('Afficher dans la console les plus gros contributeurs du projet apache/spark sur les 24derniers mois')
+
+file_df \
+    .select(col("author"), col("commit"), col("date"), to_date(col("date"), "EEE LLL dd hh:mm:ss yyyy Z").alias("to_date")) \
+    .where(col("repo") == "apache/spark") \
+    .where(months_between(current_date(), col("to_date")) <= 24) \
+    .groupBy(col("author")) \
+    .agg(count(col("author")).alias("contribution")) \
+    .orderBy("contribution") \
+    .show(n=10, truncate=False)
+
 print('Afficher dans la console les 10 mots qui reviennent le plus dans les messages de commit sur l’ensemble des projets.')
 
 stop_words_path = "englishST.txt"
@@ -55,11 +66,3 @@ file_df.withColumn('word', explode(split(col('message'), ' '))) \
     .sort('count', ascending=False) \
     .show(10, False)
 
-file_df \
-    .select(col("author"), col("commit"), col("date"), to_date(col("date"), "EEE LLL dd hh:mm:ss yyyy Z").alias("to_date")) \
-    .where(col("repo") == "apache/spark") \
-    .where(months_between(current_date(), col("to_date")) <= 24) \
-    .groupBy(col("author")) \
-    .agg(count(col("author")).alias("contribution")) \
-    .orderBy("contribution") \
-    .show(n=10, truncate=False)
